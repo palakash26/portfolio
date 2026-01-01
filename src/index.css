@@ -1,0 +1,162 @@
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables for Dynamic Theming */
+:root {
+  --color-primary: #1a1a1a;
+  --color-secondary: #2d2d2d;
+  --color-accent: #f97316;
+  --color-amber: #f59e0b;
+  --color-danger: #dc2626;
+  --color-text: #ffffff;
+}
+
+@layer base {
+  body {
+    @apply bg-primary text-white font-sans;
+    cursor: auto;
+    /* Show default cursor on scrollbar */
+    color: var(--color-text);
+    background-color: var(--color-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Text Selection Styling - Ensure visibility over animations */
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-primary);
+    text-shadow: none;
+  }
+
+  ::-moz-selection {
+    background-color: var(--color-accent);
+    color: var(--color-primary);
+    text-shadow: none;
+  }
+
+  /* Ensure selection works properly on all text elements */
+  * {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+
+  /* Prevent selection on interactive elements and animated backgrounds */
+  button,
+  a,
+  .pointer-events-none,
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Hide Scrollbar Globally */
+::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+body {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+
+/* Custom Cursor - Lower z-index so it doesn't interfere with scrollbar */
+.custom-cursor {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  /* background set dynamically by component */
+  pointer-events: none;
+  z-index: 9000;
+  /* Below scrollbar */
+  transition: transform 0.15s ease, opacity 0.15s ease, background 0.3s ease;
+  mix-blend-mode: difference;
+  opacity: 0.8;
+}
+
+.custom-cursor-follower {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid;
+  /* border-color set dynamically by component */
+  pointer-events: none;
+  z-index: 8999;
+  /* Below cursor dot */
+  transition: transform 0.25s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease, border-color 0.3s ease;
+  opacity: 0.5;
+}
+
+/* Cursor hover effect on interactive elements */
+a:hover~.custom-cursor,
+button:hover~.custom-cursor,
+.cursor-pointer:hover~.custom-cursor {
+  transform: scale(1.5);
+  opacity: 1;
+}
+
+a:hover~.custom-cursor-follower,
+button:hover~.custom-cursor-follower,
+.cursor-pointer:hover~.custom-cursor-follower {
+  width: 60px;
+  height: 60px;
+  opacity: 0.8;
+  border-color: #f59e0b;
+}
+
+/* Hide custom cursor near scrollbar area */
+body:hover::-webkit-scrollbar {
+  cursor: pointer;
+}
+
+/* Hide custom cursor on navbar */
+.navbar-container,
+.navbar-container * {
+  cursor: auto !important;
+}
+
+/* Also hide the custom cursor elements when over navbar */
+.navbar-container~.custom-cursor,
+.navbar-container~.custom-cursor-follower {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* Utility class to hide scrollbar while maintaining scroll functionality */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
+  }
+}
