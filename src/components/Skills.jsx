@@ -1,188 +1,131 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Radar,
-    RadarChart,
-    PolarGrid,
-    PolarAngleAxis,
-    PolarRadiusAxis,
-    ResponsiveContainer,
-    Tooltip
-} from 'recharts';
-import { gsap } from 'gsap';
+    FaReact, FaNodeJs, FaDatabase, FaJs, FaPhp, FaGitAlt,
+    FaDocker, FaTerminal, FaCode, FaServer, FaTools, FaCheckCircle, FaLaptopCode
+} from 'react-icons/fa';
+import { SiMongodb, SiExpress, SiTailwindcss, SiNextdotjs, SiTypescript, SiLaravel, SiPostgresql, SiRedis } from 'react-icons/si';
 import { useTheme } from '../context/ThemeContext';
 
 const Skills = () => {
-    const skillsRef = useRef(null);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const { theme } = useTheme();
-    const skills = [
-        { subject: 'React', A: 95, fullMark: 100 },
-        { subject: 'Node.js', A: 90, fullMark: 100 },
-        { subject: 'MongoDB', A: 85, fullMark: 100 },
-        { subject: 'Express', A: 88, fullMark: 100 },
-        { subject: 'Tailwind', A: 92, fullMark: 100 },
-        { subject: 'JavaScript', A: 94, fullMark: 100 },
-        { subject: 'GSAP', A: 80, fullMark: 100 },
-        { subject: 'Git', A: 87, fullMark: 100 },
+    const [selectedCategory, setSelectedCategory] = useState('All');
+
+    const skillsData = [
+        // Frontend
+        { name: 'React 18', category: 'Frontend', level: 95, icon: FaReact, color: '#61dafb' },
+        { name: 'Next.js 14', category: 'Frontend', level: 90, icon: SiNextdotjs, color: '#ffffff' },
+        { name: 'JavaScript (ES6+)', category: 'Frontend', level: 94, icon: FaJs, color: '#f7df1e' },
+        { name: 'TypeScript', category: 'Frontend', level: 85, icon: SiTypescript, color: '#3178c6' },
+        { name: 'Tailwind CSS', category: 'Frontend', level: 96, icon: SiTailwindcss, color: '#38bdf8' },
+
+        // Backend & API
+        { name: 'Node.js', category: 'Backend', level: 92, icon: FaNodeJs, color: '#339933' },
+        { name: 'Express.js', category: 'Backend', level: 90, icon: SiExpress, color: '#ffffff' },
+        { name: 'PHP / Laravel', category: 'Backend', level: 85, icon: SiLaravel, color: '#ff2d20' },
+        { name: 'REST APIs', category: 'Backend', level: 95, icon: FaServer, color: '#f97316' },
+
+        // Database
+        { name: 'MongoDB', category: 'Database', level: 88, icon: SiMongodb, color: '#47a248' },
+        { name: 'PostgreSQL', category: 'Database', level: 82, icon: SiPostgresql, color: '#4169e1' },
+        { name: 'Redis', category: 'Database', level: 80, icon: SiRedis, color: '#dc382d' },
+
+        // Tools & DevOps
+        { name: 'Git & GitHub', category: 'DevOps', level: 92, icon: FaGitAlt, color: '#f05032' },
+        { name: 'Docker', category: 'DevOps', level: 78, icon: FaDocker, color: '#2496ed' },
+        { name: 'Vite & Build Tools', category: 'DevOps', level: 88, icon: FaTools, color: '#646cff' }
     ];
 
-    const CustomTooltip = ({ active, payload, label }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="bg-secondary/90 backdrop-blur-md border border-accent/30 p-3 rounded-lg shadow-xl">
-                    <p className="text-accent font-bold mb-1">{label}</p>
-                    <p className="text-white text-sm">
-                        Proficiency: <span className="font-mono text-amber">{payload[0].value}%</span>
-                    </p>
-                </div>
-            );
-        }
-        return null;
-    };
+    const categories = ['All', 'Frontend', 'Backend', 'Database', 'DevOps'];
 
-    // Mouse tracking for parallax effect
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            const { clientX, clientY } = e;
-            const skillsElement = skillsRef.current;
-            if (!skillsElement) return;
-
-            const rect = skillsElement.getBoundingClientRect();
-            const x = ((clientX - rect.left) / rect.width - 0.5) * 2;
-            const y = ((clientY - rect.top) / rect.height - 0.5) * 2;
-
-            setMousePosition({ x, y });
-
-            gsap.to('.skills-orb-1', {
-                x: x * 75,
-                y: y * 65,
-                duration: 2.3,
-                ease: 'power2.out',
-            });
-
-            gsap.to('.skills-orb-2', {
-                x: -x * 85,
-                y: -y * 70,
-                duration: 2.6,
-                ease: 'power2.out',
-            });
-        };
-
-        const skillsElement = skillsRef.current;
-        skillsElement?.addEventListener('mousemove', handleMouseMove);
-
-        return () => {
-            skillsElement?.removeEventListener('mousemove', handleMouseMove);
-        };
-    }, []);
+    const filteredSkills = selectedCategory === 'All'
+        ? skillsData
+        : skillsData.filter(s => s.category === selectedCategory);
 
     return (
-        <section
-            ref={skillsRef}
-            id="skills"
-            className="py-20 bg-primary relative overflow-hidden"
-        >
-            {/* Animated Background Orbs */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <section id="skills" className="py-16 bg-slate-950 relative overflow-hidden text-gray-200">
+            {/* Ambient Background Radial Glow */}
+            <div className="absolute inset-0 pointer-events-none opacity-15">
                 <div
-                    className="skills-orb-1 absolute top-1/3 right-1/4 w-96 h-96 rounded-full blur-3xl transition-colors duration-500"
-                    style={{ backgroundColor: `${theme.colors.danger}33` }}
-                />
-                <div
-                    className="skills-orb-2 absolute bottom-1/4 left-1/4 w-80 h-80 rounded-full blur-3xl transition-colors duration-500"
-                    style={{ backgroundColor: `${theme.colors.amber}33` }}
-                />
-
-                {/* Floating particles */}
-                <div
-                    className="absolute w-3 h-3 rounded-full opacity-40 transition-all duration-1000"
-                    style={{
-                        backgroundColor: theme.colors.accent,
-                        left: `${65 + mousePosition.x * 9}%`,
-                        top: `${50 + mousePosition.y * 7}%`,
-                        boxShadow: `0 0 15px ${theme.colors.accent}cc`,
-                    }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full blur-[140px]"
+                    style={{ backgroundColor: theme.colors.accent }}
                 />
             </div>
 
-            <div className="container mx-auto px-6 relative z-10">
-                <motion.h2
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: false, amount: 0.3 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="text-4xl md:text-5xl font-bold mb-12 text-center"
-                >
-                    <span className="text-amber">02.</span>{' '}
-                    <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                        Skills & Technologies
-                    </span>
-                </motion.h2>
-
-                <div className="flex flex-col md:flex-row items-center justify-center gap-12">
-                    {/* Chart Container */}
-                    <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        whileInView={{ scale: 1, opacity: 1 }}
-                        viewport={{ once: false }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="w-full md:w-2/3 h-[400px] md:h-[500px] bg-secondary/20 backdrop-blur-sm rounded-3xl border border-white/5 p-4 relative"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-b from-accent/5 to-transparent rounded-3xl pointer-events-none"></div>
-
-                        <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={skills}>
-                                <PolarGrid gridType="polygon" stroke="rgba(255,255,255,0.1)" />
-                                <PolarAngleAxis
-                                    dataKey="subject"
-                                    tick={{ fill: '#9ca3af', fontSize: 12, fontWeight: 600 }}
-                                />
-                                <PolarRadiusAxis
-                                    angle={30}
-                                    domain={[0, 100]}
-                                    tick={false}
-                                    axisLine={false}
-                                />
-                                <Radar
-                                    name="Skill Level"
-                                    dataKey="A"
-                                    stroke="var(--color-accent)"
-                                    strokeWidth={3}
-                                    fill="var(--color-accent)"
-                                    fillOpacity={0.3}
-                                />
-                                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.2)', strokeWidth: 1 }} />
-                            </RadarChart>
-                        </ResponsiveContainer>
-                    </motion.div>
-
-                    {/* Legend / Description (Optional side content) */}
-                    <motion.div
-                        initial={{ x: 50, opacity: 0 }}
-                        whileInView={{ x: 0, opacity: 1 }}
-                        viewport={{ once: false }}
-                        transition={{ duration: 0.8, delay: 0.4 }}
-                        className="w-full md:w-1/3 space-y-6"
-                    >
-                        <div className="bg-accent/10 border border-accent/20 p-6 rounded-2xl">
-                            <h3 className="text-xl font-bold text-white mb-2">Technical Proficiency</h3>
-                            <p className="text-gray-400 text-sm leading-relaxed">
-                                My expertise spans across the full MERN stack, with a strong focus on frontend performance and backend scalability. This radar chart visualizes my relative strengths in key technologies.
-                            </p>
+            <div className="container mx-auto px-6 relative z-10 max-w-6xl">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-10 border-b border-white/10 pb-6">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent text-xs font-mono mb-2">
+                            <FaTerminal /> Tech Capabilities & Mastery
                         </div>
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-white">
+                            <span className="text-amber">03.</span> Skills & Technologies
+                        </h2>
+                    </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-amber/10 border border-amber/20 p-4 rounded-xl text-center">
-                                <span className="block text-2xl font-bold text-amber mb-1">95%</span>
-                                <span className="text-xs text-gray-400 uppercase tracking-wider">React Mastery</span>
-                            </div>
-                            <div className="bg-danger/10 border border-danger/20 p-4 rounded-xl text-center">
-                                <span className="block text-2xl font-bold text-danger mb-1">5+</span>
-                                <span className="text-xs text-gray-400 uppercase tracking-wider">Major Techs</span>
-                            </div>
-                        </div>
-                    </motion.div>
+                    {/* Category Selector Pills */}
+                    <div className="flex flex-wrap items-center gap-2 bg-slate-900/90 border border-white/10 p-1.5 rounded-2xl shadow-xl">
+                        {categories.map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${selectedCategory === cat
+                                        ? 'bg-gradient-to-r from-accent to-amber text-slate-950 font-extrabold shadow-md scale-105'
+                                        : 'text-gray-400 hover:text-white'
+                                    }`}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Compact Interactive Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                    <AnimatePresence mode="popLayout">
+                        {filteredSkills.map((skill, index) => {
+                            const IconComponent = skill.icon;
+                            return (
+                                <motion.div
+                                    key={skill.name}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    transition={{ duration: 0.25, delay: index * 0.03 }}
+                                    className="bg-slate-900/70 border border-white/10 hover:border-accent/60 p-3.5 rounded-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 shadow-lg group flex flex-col justify-between"
+                                >
+                                    <div className="flex items-center justify-between gap-2 mb-2">
+                                        <div className="flex items-center gap-2.5 min-w-0">
+                                            <div
+                                                className="w-8 h-8 rounded-lg flex items-center justify-center text-lg bg-white/5 border border-white/10 shrink-0 group-hover:scale-110 transition-transform"
+                                                style={{ color: skill.color }}
+                                            >
+                                                <IconComponent />
+                                            </div>
+                                            <span className="text-xs font-bold text-white truncate group-hover:text-amber transition-colors">
+                                                {skill.name}
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] font-mono font-bold text-amber bg-amber/10 px-1.5 py-0.5 rounded border border-amber/20 shrink-0">
+                                            {skill.level}%
+                                        </span>
+                                    </div>
+
+                                    {/* Compact Progress Bar */}
+                                    <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-white/5">
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${skill.level}%` }}
+                                            transition={{ duration: 0.8, ease: 'easeOut' }}
+                                            className="h-full rounded-full bg-gradient-to-r from-accent to-amber shadow-sm"
+                                        />
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                    </AnimatePresence>
                 </div>
             </div>
         </section>

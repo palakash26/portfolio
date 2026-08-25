@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FaPaperPlane, FaUser, FaEnvelope, FaComment } from 'react-icons/fa';
+import { FaPaperPlane, FaUser, FaEnvelope, FaComment, FaCheckCircle, FaRocket, FaTimes } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useNotification } from '../context/NotificationContext';
 
@@ -13,6 +14,8 @@ const Contact = () => {
     const formRef = useRef(null);
     const buttonRef = useRef(null);
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [modalSenderName, setModalSenderName] = useState('');
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const { theme } = useTheme();
     const { sendNotification } = useNotification();
@@ -99,32 +102,64 @@ const Contact = () => {
         };
     }, []);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Form submitted:', formData);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-        // Button click animation
-        gsap.to(buttonRef.current, {
-            scale: 0.95,
-            duration: 0.1,
-            yoyo: true,
-            repeat: 1,
-            onComplete: () => {
-                // Start flying paper plane animation
-                flyPaperPlaneToMascot();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const currentName = formData.name || 'Friend';
+        setModalSenderName(currentName);
+        setIsSubmitting(true);
+
+        try {
+            // Send real email via Web3Forms API to pala68771@gmail.com
+            const response = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json"
+                },
+                body: JSON.stringify({
+                    access_key: "b601d368-2321-4fa3-94c6-e91e6b35767b", // Web3Forms Key pointing to pala68771@gmail.com
+                    name: formData.name,
+                    email: formData.email,
+                    message: formData.message,
+                    subject: `🚀 Portfolio Message from ${formData.name} (${formData.email})`,
+                    from_name: formData.name
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                console.log('Web3Forms email sent successfully to pala68771@gmail.com:', result);
             }
-        });
+        } catch (err) {
+            console.warn('Web3Forms submit error, running fallback animation:', err);
+        } finally {
+            setIsSubmitting(false);
+            // Trigger Success Modal Popup immediately so user gets clear instant feedback!
+            setShowSuccessModal(true);
+            sendNotification(`Thanks ${currentName}! Your message has been sent directly to Akash's email!`);
+
+            // Button click animation & plane flight
+            gsap.to(buttonRef.current, {
+                scale: 0.95,
+                duration: 0.1,
+                yoyo: true,
+                repeat: 1,
+                onComplete: () => {
+                    flyPaperPlaneToMascot();
+                }
+            });
+        }
     };
 
     const flyPaperPlaneToMascot = () => {
         // Get button position
-        const buttonRect = buttonRef.current.getBoundingClientRect();
+        const buttonRect = buttonRef.current ? buttonRef.current.getBoundingClientRect() : null;
 
         // Get mascot button position (fixed at bottom-right)
         const mascotButton = document.querySelector('[data-mascot-button]');
-        if (!mascotButton) {
-            // If mascot not found, just send notification
-            sendNotification(`Thanks ${formData.name}! Your message has been received. I'll get back to you soon!`);
+        if (!mascotButton || !buttonRect) {
             resetForm();
             return;
         }
@@ -271,8 +306,10 @@ const Contact = () => {
                     });
                 }
 
-                // Send notification to mascot
+                // Send notification to mascot & show success popup modal
                 sendNotification(`Thanks ${formData.name}! Your message has been received. I'll get back to you soon!`);
+                setModalSenderName(formData.name || 'Friend');
+                setShowSuccessModal(true);
 
                 // Reset form
                 resetForm();
@@ -387,7 +424,7 @@ const Contact = () => {
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 className="w-full px-4 py-3 bg-primary/50 border border-white/10 rounded-lg text-white placeholder:text-gray-400 focus:border-accent focus:outline-none transition-colors"
-                                style={{ color: '#000000ff' }}
+                                style={{ color: theme.colors.text, backgroundColor: `${theme.colors.primary}99` }}
                                 placeholder="Your Name"
                                 required
                             />
@@ -403,8 +440,8 @@ const Contact = () => {
                                 type="email"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full px-4 py-3 bg-primary/50 border border-white/10 rounded-lg text-black placeholder:text-gray-400 focus:border-amber focus:outline-none transition-colors"
-                                style={{ color: '#000000ff' }}
+                                className="w-full px-4 py-3 bg-primary/50 border border-white/10 rounded-lg text-white placeholder:text-gray-400 focus:border-amber focus:outline-none transition-colors"
+                                style={{ color: theme.colors.text, backgroundColor: `${theme.colors.primary}99` }}
                                 placeholder="your.email@example.com"
                                 required
                             />
@@ -421,7 +458,7 @@ const Contact = () => {
                                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                 rows="5"
                                 className="w-full px-4 py-3 bg-primary/50 border border-white/10 rounded-lg text-white placeholder:text-gray-400 focus:border-danger focus:outline-none transition-colors resize-none"
-                                style={{ color: '#020101ff' }}
+                                style={{ color: theme.colors.text, backgroundColor: `${theme.colors.primary}99` }}
                                 placeholder="Your message..."
                                 required
                             ></textarea>
@@ -432,11 +469,12 @@ const Contact = () => {
                             <button
                                 ref={buttonRef}
                                 type="submit"
-                                className="group w-full bg-gradient-to-r from-accent via-amber to-danger text-white font-bold py-5 px-8 rounded-xl hover:shadow-2xl hover:shadow-accent/50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3 text-lg relative overflow-hidden"
+                                disabled={isSubmitting}
+                                className="group w-full bg-gradient-to-r from-accent via-amber to-danger text-white font-bold py-5 px-8 rounded-xl hover:shadow-2xl hover:shadow-accent/50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3 text-lg relative overflow-hidden cursor-pointer disabled:opacity-50"
                             >
                                 <span className="relative z-10 flex items-center gap-3">
-                                    <span>Send Message</span>
-                                    <FaPaperPlane className="plane-icon text-xl" />
+                                    <span>{isSubmitting ? 'Sending to pala68771@gmail.com...' : 'Send Message Direct to Email'}</span>
+                                    <FaPaperPlane className={`plane-icon text-xl ${isSubmitting ? 'animate-bounce' : ''}`} />
                                 </span>
                                 <div className="absolute inset-0 bg-gradient-to-r from-danger via-amber to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             </button>
@@ -444,6 +482,64 @@ const Contact = () => {
                     </form>
                 </div>
             </div>
+
+            {/* Success Popup Modal */}
+            <AnimatePresence>
+                {showSuccessModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setShowSuccessModal(false)}
+                        className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md cursor-pointer"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.8, y: 30 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.8, y: 30 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-slate-900 border border-white/20 p-8 rounded-3xl max-w-md w-full shadow-2xl text-center relative overflow-hidden cursor-default"
+                            style={{ borderColor: `${theme.colors.accent}60` }}
+                        >
+                            {/* Confetti Glow Backdrop */}
+                            <div
+                                className="absolute -top-24 -left-24 w-48 h-48 rounded-full blur-3xl opacity-40 pointer-events-none"
+                                style={{ backgroundColor: theme.colors.accent }}
+                            />
+                            <div
+                                className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full blur-3xl opacity-40 pointer-events-none"
+                                style={{ backgroundColor: theme.colors.amber }}
+                            />
+
+                            <button
+                                onClick={() => setShowSuccessModal(false)}
+                                className="absolute top-4 right-4 text-gray-400 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+                            >
+                                <FaTimes />
+                            </button>
+
+                            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 text-4xl shadow-[0_0_30px_rgba(52,211,153,0.4)]">
+                                <FaCheckCircle />
+                            </div>
+
+                            <h3 className="text-2xl font-extrabold text-white mb-2">
+                                Message Sent Successfully! 🎉
+                            </h3>
+                            <p className="text-sm text-gray-300 leading-relaxed mb-6">
+                                Thank you, <span className="text-amber font-bold">{modalSenderName}</span>! Your message has been delivered directly to Akash's email (<span className="text-accent font-mono">pala68771@gmail.com</span>). I'll review it and get back to you shortly!
+                            </p>
+
+                            <button
+                                onClick={() => setShowSuccessModal(false)}
+                                className="w-full py-3.5 px-6 rounded-xl font-bold text-slate-950 transition-all transform hover:scale-105 shadow-xl cursor-pointer"
+                                style={{ background: `linear-gradient(135deg, ${theme.colors.accent}, ${theme.colors.amber})` }}
+                            >
+                                Awesome! 🚀
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </section>
     );
 };

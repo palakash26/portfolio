@@ -175,22 +175,54 @@ const Hero = () => {
                     Expert in MERN stack, creating scalable and performant web applications.
                 </p>
 
-                <div className="flex justify-center space-x-6 text-2xl mt-8" style={{ color: theme.colors.text }}>
+                {/* Interactive Action CTA Buttons */}
+                <div className="flex flex-wrap justify-center items-center gap-4 mb-8">
                     <a
-                        href="#"
+                        href="#projects"
+                        className="bg-gradient-to-r from-accent to-amber text-white font-bold px-6 py-3.5 rounded-xl shadow-lg hover:shadow-accent/40 transition-all duration-300 transform hover:scale-105 cursor-pointer text-sm"
+                    >
+                        🚀 Explore Projects
+                    </a>
+                    <a
+                        href="https://github.com/palakash26?tab=repositories"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="bg-secondary/80 border border-white/20 text-white font-bold px-6 py-3.5 rounded-xl hover:border-accent transition-all duration-300 transform hover:scale-105 cursor-pointer text-sm flex items-center gap-2"
+                    >
+                        <FaGithub className="text-lg" /> GitHub Repositories ↗
+                    </a>
+                    <a
+                        href="/Akash_resume_ATS.pdf"
+                        download="Akash_Pal_Resume.pdf"
+                        className="bg-white/5 border border-white/10 hover:border-amber text-amber font-bold px-5 py-3.5 rounded-xl transition-all duration-300 transform hover:scale-105 cursor-pointer text-sm"
+                    >
+                        📄 ATS Resume PDF
+                    </a>
+                </div>
+
+                <div className="flex justify-center space-x-6 text-2xl" style={{ color: theme.colors.text }}>
+                    <a
+                        href="https://github.com/palakash26"
+                        target="_blank"
+                        rel="noreferrer"
                         className="hover:text-accent transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 cursor-pointer"
+                        title="GitHub @palakash26"
                     >
                         <FaGithub />
                     </a>
                     <a
-                        href="#"
+                        href="https://linkedin.com"
+                        target="_blank"
+                        rel="noreferrer"
                         className="hover:text-amber transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 cursor-pointer"
+                        title="LinkedIn Profile"
                     >
                         <FaLinkedin />
                     </a>
                     <a
-                        href="#"
+                        href="mailto:pala68771@gmail.com"
                         className="hover:text-danger transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 cursor-pointer"
+                        title="Email Akash"
                     >
                         <FaEnvelope />
                     </a>

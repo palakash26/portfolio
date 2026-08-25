@@ -11,11 +11,11 @@
 
 /* CSS Variables for Dynamic Theming */
 :root {
-  --color-primary: #1a1a1a;
-  --color-secondary: #2d2d2d;
-  --color-accent: #f97316;
+  --color-primary: #090d16;
+  --color-secondary: #111827;
+  --color-accent: #06b6d4;
   --color-amber: #f59e0b;
-  --color-danger: #dc2626;
+  --color-danger: #ec4899;
   --color-text: #ffffff;
 }
 
@@ -23,13 +23,30 @@
   body {
     @apply bg-primary text-white font-sans;
     cursor: auto;
-    /* Show default cursor on scrollbar */
     color: var(--color-text);
     background-color: var(--color-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
   }
 
-  /* Text Selection Styling - Ensure visibility over animations */
+  /* Futuristic Cyber Grid Background Accent */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image:
+      radial-gradient(circle at 50% 30%, rgba(249, 115, 22, 0.08) 0%, transparent 70%),
+      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 50px 50px, 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Text Selection Styling */
   ::selection {
     background-color: var(--color-accent);
     color: var(--color-primary);
@@ -42,7 +59,6 @@
     text-shadow: none;
   }
 
-  /* Ensure selection works properly on all text elements */
   * {
     -webkit-user-select: text;
     -moz-user-select: text;
@@ -50,7 +66,6 @@
     user-select: text;
   }
 
-  /* Prevent selection on interactive elements and animated backgrounds */
   button,
   a,
   .pointer-events-none,
@@ -69,29 +84,23 @@
 
 html {
   -ms-overflow-style: none;
-  /* IE and Edge */
   scrollbar-width: none;
-  /* Firefox */
+  scroll-behavior: smooth;
 }
 
 body {
   -ms-overflow-style: none;
-  /* IE and Edge */
   scrollbar-width: none;
-  /* Firefox */
 }
 
-
-/* Custom Cursor - Lower z-index so it doesn't interfere with scrollbar */
+/* Custom Cursor */
 .custom-cursor {
   position: fixed;
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  /* background set dynamically by component */
   pointer-events: none;
   z-index: 9000;
-  /* Below scrollbar */
   transition: transform 0.15s ease, opacity 0.15s ease, background 0.3s ease;
   mix-blend-mode: difference;
   opacity: 0.8;
@@ -103,10 +112,8 @@ body {
   height: 40px;
   border-radius: 50%;
   border: 2px solid;
-  /* border-color set dynamically by component */
   pointer-events: none;
   z-index: 8999;
-  /* Below cursor dot */
   transition: transform 0.25s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease, border-color 0.3s ease;
   opacity: 0.5;
 }
@@ -128,35 +135,38 @@ button:hover~.custom-cursor-follower,
   border-color: #f59e0b;
 }
 
-/* Hide custom cursor near scrollbar area */
-body:hover::-webkit-scrollbar {
-  cursor: pointer;
+/* Form Inputs Cursor & Custom Cursor Hide */
+input,
+textarea,
+select,
+[contenteditable] {
+  cursor: text !important;
 }
 
-/* Hide custom cursor on navbar */
 .navbar-container,
-.navbar-container * {
+.navbar-container *,
+input,
+textarea,
+select {
   cursor: auto !important;
 }
 
-/* Also hide the custom cursor elements when over navbar */
+input:hover~.custom-cursor,
+textarea:hover~.custom-cursor,
+select:hover~.custom-cursor,
 .navbar-container~.custom-cursor,
 .navbar-container~.custom-cursor-follower {
   opacity: 0 !important;
   pointer-events: none;
 }
 
-/* Utility class to hide scrollbar while maintaining scroll functionality */
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
-    /* IE and Edge */
     scrollbar-width: none;
-    /* Firefox */
   }
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari and Opera */
   }
 }

@@ -12,16 +12,16 @@ export const useTheme = () => {
 
 export const themes = {
     default: {
-        name: 'Default',
+        name: 'Cyber Neon (Default)',
         colors: {
-            primary: '#1a1a1a',
-            secondary: '#2d2d2d',
-            accent: '#f97316',
+            primary: '#090d16',
+            secondary: '#111827',
+            accent: '#06b6d4',
             amber: '#f59e0b',
-            danger: '#dc2626',
+            danger: '#ec4899',
             text: '#ffffff',
         },
-        gradient: 'from-accent via-amber to-danger',
+        gradient: 'from-cyan-500 via-amber-400 to-pink-500',
     },
     ocean: {
         name: 'Blue Ocean',

@@ -1,178 +1,205 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { FaBriefcase } from 'react-icons/fa';
-import { gsap } from 'gsap';
+import React, { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaBriefcase, FaCalendarAlt, FaCheckCircle, FaLaptopCode, FaRocket, FaTerminal } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 
 const Experience = () => {
-    const experienceRef = useRef(null);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const { theme } = useTheme();
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [expandedIndex, setExpandedIndex] = useState(null);
+
     const experiences = [
         {
-            title: 'Senior Full Stack Developer',
-            company: 'Tech Solutions Inc.',
-            period: '2023 - Present',
-            description: 'Leading a team of 5 developers building scalable microservices. Implemented CI/CD pipelines and reduced deployment time by 40%.',
-            tech: ['React', 'Node.js', 'AWS', 'Docker'],
+            id: 1,
+            title: 'Senior Full Stack MERN Developer',
+            company: 'Tripora & Freelance Tech',
+            category: 'Full Stack',
+            period: '2024 - Present',
+            location: 'Remote / India',
+            summary: 'Leading end-to-end full-stack web application development, real-time AI API integration, and database query optimization.',
+            highlights: [
+                'Architected Tripora travel platform using Next.js 14, React 18, and MongoDB serverless backend.',
+                'Integrated real-time OpenAI & Gemini AI chat engine with stream processing & fallback knowledge base.',
+                'Decreased API response latency by 45% using Redis caching and optimized database indexes.'
+            ],
+            tech: ['React 18', 'Next.js', 'Node.js', 'Express', 'MongoDB', 'Redis', 'TailwindCSS'],
+            metrics: '🚀 45% Latency Reduction'
         },
         {
-            title: 'Full Stack Developer',
-            company: 'Digital Innovations',
-            period: '2021 - 2023',
-            description: 'Developed and maintained multiple client projects. Integrated payment gateways and optimized database queries for high-traffic applications.',
-            tech: ['MERN Stack', 'Redis', 'Stripe'],
+            id: 2,
+            title: 'Full Stack Web Developer & E-Commerce Lead',
+            company: 'Fabric E-Commerce Hub',
+            category: 'Full Stack',
+            period: '2023 - 2024',
+            location: 'India',
+            summary: 'Built scalable e-commerce portals with PayPal & Stripe payment integrations and Cloudinary media asset management.',
+            highlights: [
+                'Created role-based inventory management dashboard handling 10,000+ monthly orders.',
+                'Engineered PayPal checkout pipeline with webhook automated order state machine.',
+                'Designed responsive glassmorphism UI with Tailwind CSS and Framer Motion micro-interactions.'
+            ],
+            tech: ['React', 'Node.js', 'Express', 'PayPal API', 'Cloudinary', 'MongoDB'],
+            metrics: '💳 10k+ Transactions Handled'
         },
         {
-            title: 'Frontend Developer',
-            company: 'Creative Web Agency',
-            period: '2020 - 2021',
-            description: 'Collaborated with designers to implement pixel-perfect UIs. Improved site performance and SEO scores across 10+ projects.',
-            tech: ['React', 'GSAP', 'Tailwind'],
+            id: 3,
+            title: 'Backend API Specialist & Laravel Developer',
+            company: 'Wanderlust Lodging Systems',
+            category: 'Backend',
+            period: '2022 - 2023',
+            location: 'India',
+            summary: 'Developed RESTful microservices, authentication systems, and database schema migrations using Node.js, Express, and PHP/Laravel.',
+            highlights: [
+                'Built secure JWT authentication and role-based access control (RBAC) middleware.',
+                'Optimized SQL/NoSQL aggregation pipelines for complex search & filter queries.',
+                'Automated unit & integration testing pipelines to maintain 95%+ code coverage.'
+            ],
+            tech: ['PHP', 'Laravel', 'Node.js', 'Express', 'PostgreSQL', 'JWT'],
+            metrics: '⚡ 99.9% Uptime API'
         },
+        {
+            id: 4,
+            title: 'Frontend UI/UX Specialist & Interactive Craftsman',
+            company: 'Creative Web Innovations',
+            category: 'Frontend',
+            period: '2021 - 2022',
+            location: 'India',
+            summary: 'Crafted ultra-fast, responsive web interfaces, custom GSAP scroll-driven animations, and accessible design systems.',
+            highlights: [
+                'Designed modular component libraries used across 15+ production projects.',
+                'Improved Google Lighthouse SEO & performance scores from 65 to 98/100.',
+                'Implemented interactive canvas particles, dark mode themes, and custom typography.'
+            ],
+            tech: ['React', 'JavaScript (ES6+)', 'GSAP', 'TailwindCSS', 'HTML5/CSS3'],
+            metrics: '🎨 98/100 Lighthouse Score'
+        }
     ];
 
-    // Mouse tracking for parallax effect
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            const { clientX, clientY } = e;
-            const experienceElement = experienceRef.current;
-            if (!experienceElement) return;
+    const categories = ['All', 'Full Stack', 'Frontend', 'Backend'];
 
-            const rect = experienceElement.getBoundingClientRect();
-            const x = ((clientX - rect.left) / rect.width - 0.5) * 2;
-            const y = ((clientY - rect.top) / rect.height - 0.5) * 2;
-
-            setMousePosition({ x, y });
-
-            gsap.to('.experience-orb-1', {
-                x: x * 65,
-                y: y * 55,
-                duration: 2.2,
-                ease: 'power2.out',
-            });
-
-            gsap.to('.experience-orb-2', {
-                x: -x * 70,
-                y: -y * 60,
-                duration: 2.4,
-                ease: 'power2.out',
-            });
-        };
-
-        const experienceElement = experienceRef.current;
-        experienceElement?.addEventListener('mousemove', handleMouseMove);
-
-        return () => {
-            experienceElement?.removeEventListener('mousemove', handleMouseMove);
-        };
-    }, []);
+    const filteredExperiences = selectedCategory === 'All'
+        ? experiences
+        : experiences.filter(exp => exp.category === selectedCategory);
 
     return (
-        <section
-            ref={experienceRef}
-            id="experience"
-            className="py-20 bg-primary relative overflow-hidden"
-        >
-            {/* Animated Background Orbs */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <section id="experience" className="py-24 bg-slate-950 relative overflow-hidden text-gray-200">
+            {/* Background Ambient Glow */}
+            <div className="absolute inset-0 pointer-events-none opacity-20">
                 <div
-                    className="experience-orb-1 absolute top-1/4 left-1/5 w-96 h-96 rounded-full blur-3xl transition-colors duration-500"
-                    style={{ backgroundColor: `${theme.colors.accent}33` }}
-                />
-                <div
-                    className="experience-orb-2 absolute bottom-1/4 right-1/5 w-80 h-80 rounded-full blur-3xl transition-colors duration-500"
-                    style={{ backgroundColor: `${theme.colors.amber}33` }}
-                />
-
-                {/* Floating particle */}
-                <div
-                    className="absolute w-2 h-2 rounded-full opacity-50 transition-all duration-1000"
-                    style={{
-                        backgroundColor: theme.colors.danger,
-                        left: `${55 + mousePosition.x * 8}%`,
-                        top: `${45 + mousePosition.y * 6}%`,
-                        boxShadow: `0 0 12px ${theme.colors.danger}99`,
-                    }}
+                    className="absolute top-1/3 left-1/4 w-96 h-96 rounded-full blur-3xl"
+                    style={{ backgroundColor: theme.colors.accent }}
                 />
             </div>
 
             <div className="container mx-auto px-6 relative z-10">
-                <motion.h2
-                    initial={{ opacity: 0, y: -50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: false, amount: 0.3 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="text-4xl md:text-5xl font-bold mb-16 text-center"
-                >
-                    <span className="text-accent">02.</span>{' '}
-                    <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                        Experience
-                    </span>
-                </motion.h2>
+                {/* Heading */}
+                <div className="text-center max-w-3xl mx-auto mb-16">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-amber text-xs font-mono mb-4">
+                        <FaTerminal /> Career & Professional History
+                    </div>
+                    <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
+                        <span className="text-accent">02.</span>{' '}
+                        <span className="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+                            Work Experience
+                        </span>
+                    </h2>
+                    <p className="text-gray-400 text-sm md:text-base">
+                        Proven track record in full-stack MERN engineering, scalable backend API design, and interactive frontend creation.
+                    </p>
 
-                <div className="max-w-4xl mx-auto relative">
-                    {/* Central Line for Desktop */}
-                    <motion.div
-                        initial={{ height: 0 }}
-                        whileInView={{ height: '100%' }}
-                        viewport={{ once: false }}
-                        transition={{ duration: 1.5, ease: "easeInOut" }}
-                        className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-0.5 bg-white/10"
-                    ></motion.div>
+                    {/* Interactive Filter Tabs */}
+                    <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
+                        {categories.map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                className={`px-5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${selectedCategory === cat
+                                        ? 'bg-accent text-white shadow-lg shadow-accent/30 scale-105'
+                                        : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white'
+                                    }`}
+                            >
+                                {cat} Roles
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
-                    {experiences.map((exp, index) => (
-                        <motion.div
-                            key={index}
-                            initial={{ opacity: 0, y: 50 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: false, amount: 0.3 }}
-                            transition={{ duration: 0.8, delay: index * 0.2, ease: "easeOut" }}
-                            className={`relative flex flex-col md:flex-row gap-8 mb-12 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
-                        >
-
-                            {/* Timeline Dot & Line (Mobile) */}
-                            <div className="md:hidden absolute left-4 top-0 h-full w-0.5 bg-white/10 line"></div>
-                            <div className="md:hidden absolute left-4 top-10 w-3 h-3 bg-accent rounded-full transform -translate-x-1/2 dot"></div>
-
-                            {/* Content */}
-                            <div className="flex-1 md:w-1/2 content">
+                {/* Timeline Grid */}
+                <div className="max-w-4xl mx-auto space-y-8">
+                    <AnimatePresence mode="wait">
+                        {filteredExperiences.map((exp, index) => {
+                            const isExpanded = expandedIndex === exp.id;
+                            return (
                                 <motion.div
-                                    whileHover={{ scale: 1.02, borderColor: 'rgba(var(--color-accent), 0.4)' }}
-                                    className={`bg-secondary/50 backdrop-blur-sm border border-white/10 rounded-2xl p-8 transition-all duration-300 ml-8 md:ml-0 ${index % 2 === 0 ? 'md:text-left' : 'md:text-right'}`}
+                                    key={exp.id}
+                                    layout
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                                    className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 md:p-8 hover:border-accent/50 transition-all duration-300 shadow-xl relative group overflow-hidden"
                                 >
-                                    <h3 className="text-xl font-bold text-white mb-1">{exp.title}</h3>
-                                    <div className={`flex items-center gap-2 text-accent mb-4 ${index % 2 === 0 ? 'md:justify-start' : 'md:justify-end'}`}>
-                                        <FaBriefcase />
-                                        <span>{exp.company}</span>
-                                    </div>
-                                    <p className="text-gray-400 mb-4 leading-relaxed">{exp.description}</p>
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-white/10 pb-4">
+                                        <div>
+                                            <div className="flex items-center gap-3">
+                                                <div
+                                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold shadow-lg"
+                                                    style={{ background: `linear-gradient(135deg, ${theme.colors.accent}, ${theme.colors.amber})` }}
+                                                >
+                                                    <FaBriefcase />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-xl font-bold text-white group-hover:text-accent transition-colors">
+                                                        {exp.title}
+                                                    </h3>
+                                                    <p className="text-xs font-semibold text-amber flex items-center gap-2">
+                                                        <span>{exp.company}</span>
+                                                        <span className="text-gray-500">•</span>
+                                                        <span className="text-gray-400">{exp.location}</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                    <div className={`flex flex-wrap gap-2 ${index % 2 === 0 ? 'md:justify-start' : 'md:justify-end'}`}>
+                                        <div className="flex items-center gap-3">
+                                            <span className="px-3 py-1 rounded-full bg-accent/20 border border-accent/40 text-accent font-mono text-xs font-bold">
+                                                {exp.metrics}
+                                            </span>
+                                            <span className="text-xs font-mono text-gray-400 flex items-center gap-1 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
+                                                <FaCalendarAlt className="text-amber" /> {exp.period}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                                        {exp.summary}
+                                    </p>
+
+                                    {/* Highlights List */}
+                                    <div className="space-y-2 mb-6">
+                                        {exp.highlights.map((item, i) => (
+                                            <div key={i} className="flex items-start gap-2 text-xs text-gray-400">
+                                                <FaCheckCircle className="text-emerald-400 mt-0.5 shrink-0" />
+                                                <span>{item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Tech Badges */}
+                                    <div className="flex flex-wrap gap-2 pt-2 border-t border-white/5">
                                         {exp.tech.map((t, i) => (
-                                            <span key={i} className="px-3 py-1 bg-white/5 rounded-full text-xs text-gray-300 border border-white/10">
+                                            <span
+                                                key={i}
+                                                className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-gray-300 hover:border-amber/40 transition-colors"
+                                            >
                                                 {t}
                                             </span>
                                         ))}
                                     </div>
                                 </motion.div>
-                            </div>
-
-                            {/* Timeline Dot (Desktop) */}
-                            <motion.div
-                                initial={{ scale: 0, opacity: 0 }}
-                                whileInView={{ scale: 1, opacity: 1 }}
-                                viewport={{ once: false }}
-                                transition={{ duration: 0.5, delay: 0.2 + (index * 0.2) }}
-                                className="hidden md:flex absolute left-1/2 top-[120px] transform -translate-x-1/2 justify-center items-center w-8 h-8 bg-primary border-2 border-accent rounded-full z-10 dot"
-                            >
-                                <div className="w-3 h-3 bg-accent rounded-full"></div>
-                            </motion.div>
-
-                            {/* Empty Space for alternating layout */}
-                            <div className="hidden md:block flex-1"></div>
-                        </motion.div>
-                    ))}
+                            );
+                        })}
+                    </AnimatePresence>
                 </div>
             </div>
         </section>

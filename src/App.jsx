@@ -8,21 +8,21 @@ import About from './components/About';
 import Experience from './components/Experience';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
+import GitHubStats from './components/GitHubStats';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import Mascot from './components/Mascot';
 import CustomCursor from './components/CustomCursor';
 import Loader from './components/Loader';
+import Chatbot from './components/Chatbot';
 
 const AppContent = () => {
   const { font } = useTheme();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading time (minimum 2 seconds)
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 2500);
+    }, 2200);
 
     return () => clearTimeout(timer);
   }, []);
@@ -41,9 +41,10 @@ const AppContent = () => {
         <Experience />
         <Skills />
         <Projects />
+        <GitHubStats />
         <Contact />
         <Footer />
-        <Mascot />
+        <Chatbot />
       </div>
     </>
   );
